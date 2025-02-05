@@ -1,6 +1,6 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 
-const walletAddress = 'BJdU2fqBSr7E2JozB6iAYpr87fjPperukideGvZsMp6A';
+const walletAddress = '';
 async function fetchBalance() {
     // Create a connection to the Solana devnet (or use mainnet, testnet)
     const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
