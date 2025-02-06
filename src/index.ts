@@ -1,22 +1,18 @@
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 
-const walletAddress = '';
-async function fetchBalance() {
-    // Create a connection to the Solana devnet (or use mainnet, testnet)
-    const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+async function getPhantomWalletBalance(walletAddress: string) {
+  try {
+    const connection = new Connection(clusterApiUrl("devnet"));
 
-    // Convert the wallet address to a PublicKey
     const publicKey = new PublicKey(walletAddress);
 
-    // Fetch the balance
     const balance = await connection.getBalance(publicKey);
 
-    // Convert the balance from lamports (smallest unit of Solana) to SOL
-    const balanceInSol = balance / 1e9; // 1 SOL = 1 billion lamports
+    const solBalance = balance / 1_000_000_000;
 
-    console.log(`Balance of ${walletAddress}: ${balanceInSol} SOL`);
+    console.log(`Wallet Balance: ${solBalance} SOL`);
+    return solBalance;
+  } catch (error) {
+    console.error("Error fetching balance:", error);
+  }
 }
-
-fetchBalance().catch((error) => {
-    console.error('Error fetching balance:', error);
-});
