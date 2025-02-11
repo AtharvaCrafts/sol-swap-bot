@@ -1,3 +1,5 @@
+//This code is written by Atharva Kulkarni
+
 import bs58 from "bs58";
 import { Connection, Keypair, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js'
 import { NATIVE_MINT, getAssociatedTokenAddress } from '@solana/spl-token'
