@@ -14,7 +14,13 @@ const slippage = 5;
 
 const solanaAmount = 0.001 * LAMPORTS_PER_SOL;
 
+import config from './config';
+
 export async function swap(tokenAddress: string, amount: number) {
+    if (!config.isActive) {
+        console.log("Bot is stopped. Please start the bot to execute swaps.");
+        return;
+    }
  
     const { data } = await axios.get<{
         id: string
