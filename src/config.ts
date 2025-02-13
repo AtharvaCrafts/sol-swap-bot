@@ -1,15 +1,8 @@
-interface BotConfig {
-    privateWallet: string;
-    contractAddress: string;
-    volumeThreshold: number; // Custom volume setting
-    isActive: boolean; // Start/stop feature
-}
+import { BotConfig } from "./dto/TBotConfig";
 
-const config: BotConfig = {
+export const config: BotConfig = {
     privateWallet: '',
     contractAddress: '',
     volumeThreshold: 0,
     isActive: false,
 };
-
-export default config;

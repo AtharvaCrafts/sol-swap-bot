@@ -1,6 +1,6 @@
 import * as readline from 'readline';
-import config from './config';
 import fs from 'fs';
+import { config } from './config';
 
 const rl = readline.createInterface({
     input: process.stdin,

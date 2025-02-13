@@ -5,6 +5,7 @@ import { Connection, Keypair, PublicKey, Transaction, VersionedTransaction, LAMP
 import { NATIVE_MINT, getAssociatedTokenAddress } from '@solana/spl-token'
 import axios from 'axios'
 import { API_URLS } from '@raydium-io/raydium-sdk-v2'
+import { config } from "./config";
 const isV0Tx = true;
 const connection = new Connection(process.env.RPC_URL!);
 
@@ -13,8 +14,6 @@ const owner = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY!));
 const slippage = 5;
 
 const solanaAmount = 0.001 * LAMPORTS_PER_SOL;
-
-import config from './config';
 
 export async function swap(tokenAddress: string, amount: number) {
     if (!config.isActive) {
