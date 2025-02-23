@@ -5,9 +5,9 @@ import { Connection, Keypair, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.j
 import { getSellTxWithJupiter } from "./Buy-Sell-Ex/sell";
 import { swap } from "./Buy-Sell-Ex/buy"
 import { execute } from "./Buy-Sell-Ex/executeTransaction";
-const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=ca26b58d-864c-4f79-a975-a8c812e965a6");
+const connection = new Connection("");
 
-export const owner = Keypair.fromSecretKey(bs58.decode("3Ky3r1BfevQrNR41eBYMLqBL6gwd6oztrn5Nwd3TNX3RDBLRo9LsPKjwsQCzWmyRMy94S3ZvwHjnqttTcDZmidM6"));
+export const owner = Keypair.fromSecretKey(bs58.decode(""));
 
 const loopVal = process.env.LOOPVAL!;
 export async function swapFunc(tokenAddress: string, amount: number) {
