@@ -4,8 +4,8 @@ import { Blockhash } from '../dto/type';
 
 // const RPC_WEBSOCKET_ENDPOINT = process.env.RPC_WEBSOCKET_ENDPOINT!;
 // const RPC_ENDPOINT = process.env.RPC_ENDPOINT!;
-export const RPC_ENDPOINT="https://mainnet.helius-rpc.com/?api-key=ca26b58d-864c-4f79-a975-a8c812e965a6"
-export const RPC_WEBSOCKET_ENDPOINT='wss://mainnet.helius-rpc.com/?api-key=ca26b58d-864c-4f79-a975-a8c812e965a6'
+export const RPC_ENDPOINT=""
+export const RPC_WEBSOCKET_ENDPOINT=""
 
 export const execute = async (transaction: VersionedTransaction, latestBlockhash: Blockhash, isBuy: boolean = true) => {
     if (!RPC_WEBSOCKET_ENDPOINT || !RPC_ENDPOINT) {
