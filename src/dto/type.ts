@@ -22,4 +22,9 @@ interface SwapCompute {
         feeAmount: string
       }[]
     }
-  }
+}
+
+export type Blockhash  = {
+  blockhash: string;
+  lastValidBlockHeight: number;
+}

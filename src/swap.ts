@@ -1,92 +1,50 @@
 //This code is written by Atharva Kulkarni
 
 import bs58 from "bs58";
-import { Connection, Keypair, PublicKey, Transaction, VersionedTransaction, LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { NATIVE_MINT, getAssociatedTokenAddress } from '@solana/spl-token'
-import axios from 'axios'
-import { API_URLS } from '@raydium-io/raydium-sdk-v2'
-import { config } from "./config";
-const isV0Tx = true;
-const connection = new Connection(process.env.RPC_URL!);
+import { Connection, Keypair, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { getSellTxWithJupiter } from "./Buy-Sell-Ex/sell";
+import { swap } from "./Buy-Sell-Ex/buy"
+import { execute } from "./Buy-Sell-Ex/executeTransaction";
+const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=ca26b58d-864c-4f79-a975-a8c812e965a6");
 
-const owner = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY!));
+export const owner = Keypair.fromSecretKey(bs58.decode("3Ky3r1BfevQrNR41eBYMLqBL6gwd6oztrn5Nwd3TNX3RDBLRo9LsPKjwsQCzWmyRMy94S3ZvwHjnqttTcDZmidM6"));
 
-const slippage = 5;
+const loopVal = process.env.LOOPVAL!;
+export async function swapFunc(tokenAddress: string, amount: number) {
+    // if (!config.isActive || !loopVal) {
+    //     console.log("❌ Bot stopped: Required config params missing.");
+    //     return;
+    // }
 
-const solanaAmount = 0.001 * LAMPORTS_PER_SOL;
+    const mint = new PublicKey(tokenAddress);
 
-export async function swap(tokenAddress: string, amount: number) {
-    if (!config.isActive) {
-        console.log("Bot is stopped. Please start the bot to execute swaps.");
-        return;
+    const lamportsPerCoin = amount * 100000;
+    for (let i = 0; i < 1; i++) {
+        console.log(`🔄 Iteration ${i + 1} - Buying & Selling ${amount / LAMPORTS_PER_SOL} SOL worth of ${tokenAddress}`);
+
+        try {
+            // const balance = await connection.getBalance(owner.publicKey);
+            // if (balance < LAMPORTS_PER_SOL * 0.005) {  
+            //     console.log("❌ Low balance. Stopping bot.");
+            //     return;
+            // }
+            await swap(tokenAddress, amount);
+
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            const latestBlockhashForSell = await connection.getLatestBlockhash()
+            const sellTx = await getSellTxWithJupiter(owner, mint, 300000000);
+            const sellSuccess = await execute(sellTx!, latestBlockhashForSell, false);
+            if (!sellSuccess) continue;
+
+        } catch (error) {
+            console.error(`❌ Error in swap loop: ${error}`);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
- 
-    const { data } = await axios.get<{
-        id: string
-        success: boolean
-        data: { default: { vh: number; h: number; m: number } }
-      }>(`${API_URLS.BASE_HOST}${API_URLS.PRIORITY_FEE}`);
 
-    const { data: swapResponse } = await axios.get(
-        `${
-          API_URLS.SWAP_HOST
-        }/compute/swap-base-in?inputMint=${NATIVE_MINT}&outputMint=${tokenAddress}&amount=${amount}&slippageBps=${
-          slippage * 100}&txVersion=V0`
-    );
-
-    const { data: swapTransactions } = await axios.post<{
-        id: string
-        version: string
-        success: boolean
-        data: { transaction: string }[]
-      }>(`${API_URLS.SWAP_HOST}/transaction/swap-base-in`, {
-        computeUnitPriceMicroLamports: String(data.data.default.h),
-        swapResponse,
-        txVersion: 'V0',
-        wallet: owner.publicKey.toBase58(),
-        wrapSol: true,
-        unwrapSol: false,
-    })
-
-    const ata = await getAssociatedTokenAddress(new PublicKey(tokenAddress), owner.publicKey);
-
-    console.log({
-        computeUnitPriceMicroLamports: String(data.data.default.h),
-        swapResponse,
-        txVersion: 'V0',
-        wallet: owner.publicKey.toBase58(),
-        wrapSol: true,
-        unwrapSol: false,
-        // outputMint: ata.toBase58()
-    })
-    console.log(swapTransactions)
-    const allTxBuf = swapTransactions.data.map((tx) => Buffer.from(tx.transaction, 'base64'))
-    const allTransactions = allTxBuf.map((txBuf) =>
-      isV0Tx ? VersionedTransaction.deserialize(txBuf) : Transaction.from(txBuf)
-    )
-
-    let idx = 0
-    for (const tx of allTransactions) {
-        idx++
-        const transaction = tx as VersionedTransaction
-        transaction.sign([owner])
-
-        const txId = await connection.sendTransaction(tx as VersionedTransaction, { skipPreflight: true })
-        console.log("after sending txn");
-        const { lastValidBlockHeight, blockhash } = await connection.getLatestBlockhash({
-          commitment: 'finalized',
-        })
-        console.log(`${idx} transaction sending..., txId: ${txId}`)
-        await connection.confirmTransaction(
-          {
-            blockhash,
-            lastValidBlockHeight,
-            signature: txId,
-          },
-          'confirmed'
-        )
-        console.log(`${idx} transaction confirmed`)
-    }
+    console.log("✅ Swap loop completed.");
 
 }
-swap("ADDRES", solanaAmount);
+swapFunc("DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", 0.001);
